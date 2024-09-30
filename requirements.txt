@@ -5,3 +5,4 @@ mtranslate
 python-dotenv
 nltk
 empath
+beautifulsoup4

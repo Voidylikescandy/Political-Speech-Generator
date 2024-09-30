@@ -1,3 +1,5 @@
+from deccan_scrapper import WebScraper
+
 class SpeechGenerator:
     def __init__(self, querier, translator, sentiment_analyzer, liwc_analyzer):
         self.querier = querier
@@ -72,6 +74,16 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
 
         base_speech = self.generate_base_speech(speech, requirements)
 
+        # Add webscraper
+        scraper = WebScraper(
+            base_url='https://www.deccanchronicle.com/southern-states/telangana',
+            keywords=['BJP'],
+            num_pages_to_scrape=10
+        )
+        headlines_data = scraper.extract_headlines_from_multiple_pages()
+        filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
+        text_content = scraper.extract_information_from_headlines(filtered_headlines)
+        scraper.save_to_file(text_content)
 
         web_scraped_data_integrated_speech = self.append_web_scraped_data(base_speech)
 
