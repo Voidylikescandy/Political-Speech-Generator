@@ -8,3 +8,4 @@ empath
 beautifulsoup4
 gunicorn
 gevent
+numpy
