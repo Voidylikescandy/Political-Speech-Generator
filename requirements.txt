@@ -6,3 +6,4 @@ python-dotenv
 nltk
 empath
 beautifulsoup4
+gunicorn
