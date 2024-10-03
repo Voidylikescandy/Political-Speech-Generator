@@ -1,0 +1,6 @@
+__pycache__/
+.env
+venv/
+web_scraped_data.txt
+modi_example.txt
+example.txt

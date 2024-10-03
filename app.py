@@ -9,6 +9,13 @@ from liwc_analyzer import LIWCAnalyzer
 app = Flask(__name__)
 CORS(app)
 
+querier = Querier()
+translator = Translator()
+sentiment_analyzer = SentimentAnalyzer()
+liwc_analyzer = LIWCAnalyzer()
+speech_generator = SpeechGenerator(querier, translator, sentiment_analyzer, liwc_analyzer)
+
+
 @app.route('/')
 def home():
     return 'Hello, World!', 200
@@ -41,15 +48,5 @@ def translate():
     return jsonify(response), 200
 
 if __name__ == '__main__':
-
-    querier = Querier()
-
-    translator = Translator()
-
-    sentiment_analyzer = SentimentAnalyzer()
-
-    liwc_analyzer = LIWCAnalyzer()
-
-    speech_generator = SpeechGenerator(querier, translator, sentiment_analyzer, liwc_analyzer)
 
     app.run(host='127.0.0.1', port=10000)
