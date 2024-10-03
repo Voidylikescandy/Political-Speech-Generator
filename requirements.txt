@@ -9,3 +9,5 @@ beautifulsoup4
 gunicorn
 gevent
 numpy
+openai[datalib]
+pandas
