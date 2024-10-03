@@ -1,5 +1,37 @@
 from deccan_scrapper import WebScraper
 
+slogans = """
+Bari Bari Sab Ki Bari, Ab Ki Bari Atal Bihari
+This was BJP's slogan when it came to power for the first time for a 13 day rule. The slogan was chanted at Lucknow election rally, in March 1996.
+
+Sonia Nahi Yeh Aandhi Hai, Doosri Indira Gandhi Hai
+In 2009, this slogan was coined by the Congress party to popularize Sonia Gandhi as the second Indira Gandhi.
+
+UP Mein Hai Dum, Kyunki Jurm Hai Yahan Kam
+The slogan was projected by Amitabh Bachchan where he gave a clean chit to Samajwadi Party by suggesting that criminal records are comparatively low in the Uttar Pradesh, during 2007 elections.
+
+UP Mein Tha Dam, Lekin Kahan Pahuch Gaye Hum
+Here, Congress targeted the Samajwadi Party and also replied to Amitabh Bachchan's advertisement with this slogan.
+
+Bachcha Bachcha Ram ka, Janmabhoomi Ke Kaam ka
+Such slogan was coined by Vishwa Hindu Parishad (VHP) sending the message of Hindutva, during election campaigns dividing country on a communal basis.
+
+Jab Tak Rahega Samose Mein Aloo, Tab Tak Rahega Bihar Mein Lalu
+This is one of the funniest election campaigns where Lalu Prasad Yadav was projected as the original leader of Bihar.
+
+Jab Tak Sooraj Chand Rahega, Indira Tera Naam Rahega
+This election slogan was coined by the Congress for 1984 elections after Indira Gandhi's assassination which led to a massive victory of the party.
+
+Indira Hatao, Desh Bachao
+Jayaprakash Narayan's Janata Party played this slogan for Indira Gandhi's campaign.
+
+Bidi Mein Tambaku Hai, Congress-Wala Daaku Hai
+In the elections of 1967, Bhartiya Jan Sangh asked the voters to reject both Congress and tobacco.
+
+Abki Bar Modi Sarkar
+Known for promoting, "Acche Din", this was one of the most popular election slogans that spread like wildfire and resulted in the massive victory of Bhartiya Janata Party, being Narendra Modi elected as the Prime Minister of India in 2014.
+"""
+
 class SpeechGenerator:
     def __init__(self, querier, translator, sentiment_analyzer, liwc_analyzer):
         self.querier = querier
@@ -8,9 +40,6 @@ class SpeechGenerator:
         self.liwc_analyzer = liwc_analyzer
 
     def generate_base_speech(self, speech, requirements):
-        with open("slogans.txt", "r") as file:
-            slogans = file.read()
-
         prompt = """Read the instructions carefully to generate the output with tone, facial expressions, and emotions that aptly suit each statement.\n\n"""
         prompt += requirements
         prompt += "\n\n"
@@ -24,10 +53,7 @@ class SpeechGenerator:
         prompt += "\n\nYour response must be an annotated speech following the given requirements as well as a catchy slogan embedded within the speech at few places."
         return self.querier.query(prompt)
     
-    def append_web_scraped_data(self, speech):
-      with open("web_scraped_data.txt", "r") as file:
-          web_scraped_data = file.read()
-
+    def append_web_scraped_data(self, speech, web_scraped_data):
       prompt = """You have been provided with some web-scraped data and a base speech. 
       Your task is to include some parts of the web-scraped data into the base speech in such a way that the flow of the speech remains smooth and natural.
       Ensure that the data is integrated seamlessly, enhancing the speech without disrupting its structure.
@@ -99,9 +125,8 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
         filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
         text_content = scraper.extract_information_from_headlines(filtered_headlines)
         data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content);
-        scraper.save_to_file(data_filtered_text_content)
 
-        web_scraped_data_integrated_speech = self.append_web_scraped_data(base_speech)
+        web_scraped_data_integrated_speech = self.append_web_scraped_data(base_speech, data_filtered_text_content)
         print('*' * 80)
         print(web_scraped_data_integrated_speech)
         print('*' * 80)
