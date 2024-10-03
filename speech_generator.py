@@ -8,12 +8,20 @@ class SpeechGenerator:
         self.liwc_analyzer = liwc_analyzer
 
     def generate_base_speech(self, speech, requirements):
+        with open("slogans.txt", "r") as file:
+            slogans = file.read()
+
         prompt = """Read the instructions carefully to generate the output with tone, facial expressions, and emotions that aptly suit each statement.\n\n"""
         prompt += requirements
         prompt += "\n\n"
-        prompt += "Generate the speech based on the given context and requirements. For each statement, add annotations for tone, facial expressions, and emotions in parentheses. For example: 'Ladies and gentlemen, my friends of Tamil Nadu, it's truly an honor to stand before you here in Chennai today, as we prepare for the crucial MP elections! (Warm smile, hands clasped together)'"
+        prompt += "Generate the speech based on the given context and requirements. Express how proud the speaker is to be able to communicate with the audience, express gratitude towards them. For each statement, add annotations for tone, facial expressions, and emotions in parentheses. Add annotations wherever necessary - in the beginning of a sentence, in between, at the end, so on. For example: 'Ladies and gentlemen[Cheerful tone, hands opened towards the audience], my friends of Tamil Nadu, it's truly an honor to stand before you[moving right hand from up to down] here in Chennai today, as we prepare for the crucial MP elections! [Warm smile, hands clasped together, short pause]'"
         prompt += "\n\nSpeech:\n"
         prompt += speech
+        prompt += "\n\n"
+        prompt += """Incorporate a single catchy, proactive catchphrase. This is to build the bridge between the leader and the audience. Make the slogan rhyming to make it catchy. Print the slogans in English only. First, understand the context of the speech, then generate a catchy slogan and use it in the speech in the beginning, in between few paragraphs and at the end. Use it in places where it makes most sense which provide strength to the slogan. Here are some example slogans, generate a new slogan based on these."""
+        prompt += "\n\nExample Slogans:\n"
+        prompt += slogans
+        prompt += "\n\nYour response must be an annotated speech following the given requirements as well as a catchy slogan embedded within the speech at few places."
         return self.querier.query(prompt)
     
     def append_web_scraped_data(self, speech):
@@ -21,14 +29,19 @@ class SpeechGenerator:
           web_scraped_data = file.read()
 
       prompt = """You have been provided with some web-scraped data and a base speech. 
-      Your task is to include the web-scraped data into the base speech in such a way that the flow of the speech remains smooth and natural.
+      Your task is to include some parts of the web-scraped data into the base speech in such a way that the flow of the speech remains smooth and natural.
       Ensure that the data is integrated seamlessly, enhancing the speech without disrupting its structure.
+      Blend the web-scraped data into the final speech seamlessly, it is fine if the speech is elongated, a comprehensive speech is good.
+      Do not include data which feels out of place and cannot be merged into the speech.
+      Do not include too much statistical information, 3-4 instances of them are enough, choose the ones which best fit the context and have a stronger effect on the audience.
+      Do not present statistical data starting with "Recent reports". Wove them into the speech like they are a part of the story.
       
       Base Speech:
       """
       prompt += speech
       prompt += "\n\nWeb-Scraped Data:\n"
       prompt += web_scraped_data
+      prompt += "\n\nYour response must be a speech embedded with web scraped data."
 
       return self.querier.query(prompt)
 
@@ -61,7 +74,7 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
         prompt += speech
         return self.querier.query(prompt)
 
-    def filter_speech(self, speech):
+    def strip_text(self, speech):
         lines = speech.split("\n")
         filtered_lines = [line for line in lines if len(line.split()) > 1]
         filtered_text = "\n".join(filtered_lines)
@@ -73,34 +86,56 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
     def generate_speech(self, speech, requirements, language="en"):
 
         base_speech = self.generate_base_speech(speech, requirements)
+        print('*' * 80)
+        print(base_speech)
+        print('*' * 80)
 
-        # Add webscraper
         scraper = WebScraper(
-            base_url='https://www.deccanchronicle.com/southern-states/telangana',
-            keywords=['BJP'],
-            num_pages_to_scrape=10
+            base_url='https://www.deccanchronicle.com/location/india/southern-states',
+            keywords=['bjp', 'women', 'woman', 'farmer', 'farm', 'farming'],
+            num_pages_to_scrape=30
         )
         headlines_data = scraper.extract_headlines_from_multiple_pages()
         filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
         text_content = scraper.extract_information_from_headlines(filtered_headlines)
-        scraper.save_to_file(text_content)
+        data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content);
+        scraper.save_to_file(data_filtered_text_content)
 
         web_scraped_data_integrated_speech = self.append_web_scraped_data(base_speech)
+        print('*' * 80)
+        print(web_scraped_data_integrated_speech)
+        print('*' * 80)
 
 
-        personality_improved_speech = self.get_metrics(web_scraped_data_integrated_speech)
+        # personality_improved_speech = self.get_metrics(web_scraped_data_integrated_speech)
+        # print('*' * 80)
+        # print(personality_improved_speech)
+        # print('*' * 80)
 
 
-        eq_improved_speech = self.enhance_eq_score(personality_improved_speech)
+        # eq_improved_speech = self.enhance_eq_score(personality_improved_speech)
+        # print('*' * 80)
+        # print(eq_improved_speech)
+        # print('*' * 80)
 
 
-        liwc_improved_speech = self.enhance_liwc_metrics(eq_improved_speech)
+        # liwc_improved_speech = self.enhance_liwc_metrics(eq_improved_speech)
+        # print('*' * 80)
+        # print(liwc_improved_speech)
+        # print('*' * 80)
 
 
-        primed_speech = self.prime_speech(liwc_improved_speech)
+
+        # primed_speech = self.prime_speech(liwc_improved_speech)
+        # print('*' * 80)
+        # print(primed_speech)
+        # print('*' * 80)
 
 
-        filtered_speech = self.filter_speech(primed_speech)
+        filtered_speech = self.strip_text(web_scraped_data_integrated_speech)
+        print('*' * 80)
+        print(filtered_speech)
+        print('*' * 80)
 
 
         if language != "en":

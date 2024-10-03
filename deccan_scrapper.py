@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import re
 
 class WebScraper:
     def __init__(self, base_url, keywords, num_pages_to_scrape=10):
@@ -67,6 +68,19 @@ class WebScraper:
             unwanted_prefix = "Download the all new Deccan Chronicle app"
             text_content = [text for text in text_content if not text.startswith(unwanted_prefix)]
         return text_content
+    
+    def extract_sentences_with_numerical_data(self, text_content):
+        sentences_with_numbers = []
+        for paragraph in text_content:
+            # Split the paragraph into individual sentences
+            sentences = re.split(r'(?<=[.!?]) +', paragraph)
+            
+            # Check if the sentence contains any numerical data
+            for sentence in sentences:
+                if re.search(r'\d+', sentence):  # Looks for digits in the sentence
+                    sentences_with_numbers.append(sentence.strip())
+        
+        return sentences_with_numbers
 
     def is_substring(self, new_text, text_list):
         for existing_text in text_list:
