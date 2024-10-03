@@ -7,3 +7,4 @@ nltk
 empath
 beautifulsoup4
 gunicorn
+gevent
