@@ -119,7 +119,7 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
         scraper = WebScraper(
             base_url='https://www.deccanchronicle.com/location/india/southern-states',
             keywords=['bjp', 'women', 'woman', 'farmer', 'farm', 'farming'],
-            num_pages_to_scrape=30
+            num_pages_to_scrape=5
         )
         headlines_data = scraper.extract_headlines_from_multiple_pages()
         filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
