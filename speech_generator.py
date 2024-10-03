@@ -124,9 +124,10 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
         headlines_data = scraper.extract_headlines_from_multiple_pages()
         filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
         text_content = scraper.extract_information_from_headlines(filtered_headlines)
-        data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content);
+        data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content)
+        web_scraped_data = "\n".join(data_filtered_text_content)
 
-        web_scraped_data_integrated_speech = self.append_web_scraped_data(base_speech, data_filtered_text_content)
+        web_scraped_data_integrated_speech = self.append_web_scraped_data(base_speech, web_scraped_data)
         print('*' * 80)
         print(web_scraped_data_integrated_speech)
         print('*' * 80)
