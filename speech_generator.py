@@ -32,6 +32,16 @@ Abki Bar Modi Sarkar
 Known for promoting, "Acche Din", this was one of the most popular election slogans that spread like wildfire and resulted in the massive victory of Bhartiya Janata Party, being Narendra Modi elected as the Prime Minister of India in 2014.
 """
 
+opening = """
+"What makes a country truly great? Is it the power of its leaders or the strength of its people? Today, I stand before you, not just as a voice but as a reflection of your dreams, your struggles, and your unwavering spirit. Together, we will shape the future we all deserve."
+
+"They say power lies with the people. So, if you had the power to change one thing about our country, what would it be? As I look out at this sea of hope and resilience, I know that we are ready to make those changes, together."
+
+"Leadership isnt about holding a position; its about holding a vision for the future. And today, as I stand here, it is your vision, your dreams that guide me. Thank you for allowing me the privilege of walking this path with you."
+
+"Do you ever wonder why you should listen to any leader at all? Well, it's not just about listening—it's about being heard. And today, I am here because your voice is what truly matters. Lets make sure the future reflects that."
+"""
+
 class SpeechGenerator:
     def __init__(self, querier, translator, sentiment_analyzer, liwc_analyzer):
         self.querier = querier
@@ -43,24 +53,37 @@ class SpeechGenerator:
         prompt = """Read the instructions carefully to generate the output with tone, facial expressions, and emotions that aptly suit each statement.\n\n"""
         prompt += requirements
         prompt += "\n\n"
-        prompt += "Generate the speech based on the given context and requirements. Express how proud the speaker is to be able to communicate with the audience, express gratitude towards them. For each statement, add annotations for tone, facial expressions, and emotions in parentheses. Add annotations wherever necessary - in the beginning of a sentence, in between, at the end, so on. For example: 'Ladies and gentlemen[Cheerful tone, hands opened towards the audience], my friends of Tamil Nadu, it's truly an honor to stand before you[moving right hand from up to down] here in Chennai today, as we prepare for the crucial MP elections! [Warm smile, hands clasped together, short pause]'"
+        prompt += """Generate the speech based on the given context and requirements.
+            1. Express how proud the speaker is to be able to communicate with the audience, express gratitude towards them. 
+            2. For each statement, add annotations for tone, facial expressions, and emotions in parentheses. Add annotations wherever necessary - in the beginning of a sentence, in between, at the end, so on. For example: 'Ladies and gentlemen[Cheerful tone, hands opened towards the audience], my friends of Tamil Nadu, it's truly an honor to stand before you[moving right hand from up to down] here in Chennai today, as we prepare for the crucial MP elections! [Warm smile, hands clasped together, short pause]'
+            Here are some example openings, generate similar ones with equal or better intensity or generate new ones.
+            \n\nExample Openings:\n"""
+        prompt += opening
         prompt += "\n\nSpeech:\n"
         prompt += speech
         prompt += "\n\n"
-        prompt += """Incorporate a single catchy, proactive catchphrase. This is to build the bridge between the leader and the audience. Make the slogan rhyming to make it catchy. Print the slogans in English only. First, understand the context of the speech, then generate a catchy slogan and use it in the speech in the beginning, in between few paragraphs and at the end. Use it in places where it makes most sense which provide strength to the slogan. Here are some example slogans, generate a new slogan based on these."""
+        prompt += """Incorporate a single catchy, proactive catchphrase. This is to build the bridge between the leader and the audience. Make the slogan rhyming to make it catchy. Print the slogans in English only. 
+        First, understand the context of the speech. Generate a slogan which matches the context of the speech given and integrate it smoothly into the opening.
+        And use it 
+            1. In the speech in the beginning
+            2. In between few paragraphs 
+            3. And at the end.
+        Use it in places where it makes most sense which provide strength to the slogan. 
+        Here are some example slogans, generate a new slogan based on these."""
         prompt += "\n\nExample Slogans:\n"
         prompt += slogans
         prompt += "\n\nYour response must be an annotated speech following the given requirements as well as a catchy slogan embedded within the speech at few places."
         return self.querier.query(prompt)
     
     def append_web_scraped_data(self, speech, web_scraped_data):
-      prompt = """You have been provided with some web-scraped data and a base speech. 
-      Your task is to include some parts of the web-scraped data into the base speech in such a way that the flow of the speech remains smooth and natural.
-      Ensure that the data is integrated seamlessly, enhancing the speech without disrupting its structure.
-      Blend the web-scraped data into the final speech seamlessly, it is fine if the speech is elongated, a comprehensive speech is good.
-      Do not include data which feels out of place and cannot be merged into the speech.
-      Do not include too much statistical information, 3-4 instances of them are enough, choose the ones which best fit the context and have a stronger effect on the audience.
-      Do not present statistical data starting with "Recent reports". Wove them into the speech like they are a part of the story.
+      prompt = """You have been provided with some web-scraped data and a base speech. There are 7 tasks.
+      1. Your task is to include some parts of the web-scraped data into the base speech in such a way that the flow of the speech remains smooth and natural.
+      2. Ensure that the data is integrated seamlessly, enhancing the speech without disrupting its structure.
+      3. Blend the web-scraped data into the final speech seamlessly, it is fine if the speech is elongated, a comprehensive speech is good.
+      4. Do not include data which feels out of place and cannot be merged into the speech.
+      5. Do not include too much statistical information, 5-6 instances of them are enough, choose the ones which best fit the context and have a stronger effect on the audience.
+      6. Do not present statistical data starting with "Recent reports", "Recent times", "Recent studies", "Regarding" etc. Weave them into the speech like they are a part of the story.
+      7. Group related information paragraphs together to ensure the flow is not broken.
       
       Base Speech:
       """
@@ -70,6 +93,24 @@ class SpeechGenerator:
       prompt += "\n\nYour response must be a speech embedded with web scraped data."
 
       return self.querier.query(prompt)
+    
+    def final_check(self, speech):
+        prompt = """Alright, here is the final speech after appending webscraped data. 
+        Now what I would like to do is do one final check.
+        1. Check if the speech is strong and captivating.
+        2. Make necessary improvements in vocabulary or sentence phrasing if it makes the speech better.
+        3. Do not change core of the speech. The speech is supposed to be annotated, mixed with webscraped data and the speech should sound human.
+        4. In case there are sentences which do not fit the context or there are paragraphs where a smooth transition from previous paragraph is missing, enhance the speech in these areas.
+        5. In case no enhancement is able to keep the speech smooth, remove such information, but keep removal to a minimum.
+        6. In case there are named entities in the speech (for example, states like Andhra Pradesh, Telangana or people) ensure that the information regarding them is properly integrated into the speech in a smooth fashion. Don't make the paragraphs look disjoint.
+        8. The stories involved should have a fulfilling ending matching the context of the speech.
+        9. Any additions made to the speech should be annotated properly.
+        10. At last, make the speech perfect."""
+        prompt += "\n\nSpeech:\n"
+        prompt += speech
+        prompt += "\nYour response should be an enhanced speech, with human touch, captivating, heart touching, retaining most of the previous structure, annotations and information."
+
+        return self.querier.query(prompt)
 
 
     def get_metrics(self, speech):
@@ -109,7 +150,7 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
     def translate_speech(self, speech, language):
         return self.translator.translate(speech, language)
 
-    def generate_speech(self, speech, requirements, language="en"):
+    def generate_speech(self, speech, requirements, newspaper, state, language="en"):
 
         base_speech = self.generate_base_speech(speech, requirements)
         print('*' * 80)
@@ -118,13 +159,14 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
 
         scraper = WebScraper(
             base_url='https://www.deccanchronicle.com/location/india/southern-states',
-            keywords=['bjp', 'women', 'woman', 'farmer', 'farm', 'farming'],
-            num_pages_to_scrape=5
+            keywords=['bjp', 'modi'],
+            num_pages_to_scrape=30
         )
         headlines_data = scraper.extract_headlines_from_multiple_pages()
         filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
         text_content = scraper.extract_information_from_headlines(filtered_headlines)
         data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content)
+        scraper.save_to_file(data_filtered_text_content, "web_scraped_data.txt")
         web_scraped_data = "\n".join(data_filtered_text_content)
 
         web_scraped_data_integrated_speech = self.append_web_scraped_data(base_speech, web_scraped_data)
@@ -157,8 +199,12 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
         # print(primed_speech)
         # print('*' * 80)
 
+        final_speech = self.final_check(web_scraped_data_integrated_speech)
+        print('*' * 80)
+        print(final_speech)
+        print('*' * 80)
 
-        filtered_speech = self.strip_text(web_scraped_data_integrated_speech)
+        filtered_speech = self.strip_text(final_speech)
         print('*' * 80)
         print(filtered_speech)
         print('*' * 80)

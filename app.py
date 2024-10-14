@@ -23,9 +23,11 @@ def home():
 @app.route('/generate_speech', methods=['POST'])
 def generate_speech():
     data = request.get_json()
-    speech, requirements = data['speech'], data['requirements']
+    print(data)
+    exit(0)
+    speech, requirements, newspaper, state = data['speech'], data['requirements'], data['newspaper'], data['state']
     print('Generating speech...')
-    generated_speech = speech_generator.generate_speech(speech, requirements)
+    generated_speech = speech_generator.generate_speech(speech, requirements, newspaper, state)
     response = {
         'generated_speech': generated_speech
     }
