@@ -11,3 +11,4 @@ gevent
 numpy
 openai[datalib]
 pandas
+uvicorn
