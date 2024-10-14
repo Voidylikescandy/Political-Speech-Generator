@@ -42,6 +42,43 @@ opening = """
 "Do you ever wonder why you should listen to any leader at all? Well, it's not just about listening—it's about being heard. And today, I am here because your voice is what truly matters. Lets make sure the future reflects that."
 """
 
+# List of South Indian states in lowercase and hyphenated
+south_states = [
+    "tamil-nadu",
+    "kerala",
+    "karnataka",
+    "andhra-pradesh",
+    "telangana"
+]
+
+# List of all Indian states excluding the South Indian states
+north_states = [
+    "jammu-and-kashmir",
+    "himachal-pradesh",
+    "punjab",
+    "uttarakhand",
+    "haryana",
+    "uttar-pradesh",
+    "rajasthan",
+    "chandigarh",
+    "madhya-pradesh",
+    "chhattisgarh",
+    "bihar",
+    "jharkhand",
+    "west-bengal",
+    "odisha",
+    "sikkim",
+    "assam",
+    "arunachal-pradesh",
+    "manipur",
+    "meghalaya",
+    "mizoram",
+    "nagaland",
+    "tripura",
+    "ladakh",
+    "goa"
+]
+
 class SpeechGenerator:
     def __init__(self, querier, translator, sentiment_analyzer, liwc_analyzer):
         self.querier = querier
@@ -157,9 +194,13 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
         print(base_speech)
         print('*' * 80)
 
+        words = ['bjp', 'modi']
+        state = state.lower().replace(" ", "-")
+        url="https://www.deccanchronicle.com/location/india/"+state
+
         scraper = WebScraper(
-            base_url='https://www.deccanchronicle.com/location/india/southern-states',
-            keywords=['bjp', 'modi'],
+            base_url=url,
+            keywords=words,
             num_pages_to_scrape=30
         )
         headlines_data = scraper.extract_headlines_from_multiple_pages()
