@@ -1,4 +1,8 @@
 from deccan_scrapper import WebScraper
+from langchain.chains import RetrievalQA
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.docstore.document import Document
 
 slogans = """
 Bari Bari Sab Ki Bari, Ab Ki Bari Atal Bihari
@@ -85,6 +89,31 @@ class SpeechGenerator:
         self.translator = translator
         self.sentiment_analyzer = sentiment_analyzer
         self.liwc_analyzer = liwc_analyzer
+        self.embeddings = OpenAIEmbeddings()
+
+    def web_scraped_data(self,state):
+        words = ['bjp', 'modi']
+        state = state.lower().replace(" ", "-")
+        url="https://www.deccanchronicle.com/location/india/"+state
+
+        scraper = WebScraper(
+            base_url=url,
+            keywords=words,
+            num_pages_to_scrape=30
+        )
+        headlines_data = scraper.extract_headlines_from_multiple_pages()
+        filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
+        text_content = scraper.extract_information_from_headlines(filtered_headlines)
+        data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content)
+        # scraper.save_to_file(data_filtered_text_content, "web_scraped_data.txt")
+        # web_scraped_data = "\n".join(data_filtered_text_content)
+        documents = [Document(page_content=text) for text in data_filtered_text_content]
+        return documents
+
+    def setup_retriever(self,documents):
+        # Create a FAISS vector store
+        vector_store = FAISS.from_documents(documents, self.embeddings)
+        return vector_store.as_retriever()
 
     def generate_base_speech(self, speech, requirements):
         prompt = """Read the instructions carefully to generate the output with tone, facial expressions, and emotions that aptly suit each statement.\n\n"""
@@ -99,7 +128,7 @@ class SpeechGenerator:
         prompt += "\n\nSpeech:\n"
         prompt += speech
         prompt += "\n\n"
-        prompt += """Incorporate a single catchy, proactive catchphrase. This is to build the bridge between the leader and the audience. Make the slogan rhyming to make it catchy. Print the slogans in English only. 
+        prompt += """Incorporate a catchy, proactive catchphrase. This is to build the bridge between the leader and the audience. Make the slogan rhyming to make it catchy. Print the slogans in English only. 
         First, understand the context of the speech. Generate a slogan which matches the context of the speech given and integrate it smoothly into the opening.
         And use it 
             1. In the speech in the beginning
@@ -149,7 +178,6 @@ class SpeechGenerator:
 
         return self.querier.query(prompt)
 
-
     def get_metrics(self, speech):
         prompt = """You need to assess the following 5 personality traits from the below speech by giving it a score of 1 to 10 (discrete values) where 10 is the highest score and 1 is the lowest score (use floor value):
     (Agreeableness, Conscientiousness, Extraversion, Emotional range, Openness). Output should only be the scores with no extra text or information. Then regenerate the speech to improve the metrics and also sound more human.\n\n"""
@@ -189,51 +217,35 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
 
     def generate_speech(self, speech, requirements, newspaper, state, language="en"):
 
+        documents = self.web_scraped_data(state)
+        retriever = self.setup_retriever(documents)
+        retrieved_docs = retriever.get_relevant_documents(requirements)
+        context = "\n".join([doc.page_content for doc in retrieved_docs])
+
         base_speech = self.generate_base_speech(speech, requirements)
         print('*' * 80)
         print(base_speech)
         print('*' * 80)
-
-        words = ['bjp', 'modi']
-        state = state.lower().replace(" ", "-")
-        url="https://www.deccanchronicle.com/location/india/"+state
-
-        scraper = WebScraper(
-            base_url=url,
-            keywords=words,
-            num_pages_to_scrape=30
-        )
-        headlines_data = scraper.extract_headlines_from_multiple_pages()
-        filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
-        text_content = scraper.extract_information_from_headlines(filtered_headlines)
-        data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content)
-        scraper.save_to_file(data_filtered_text_content, "web_scraped_data.txt")
-        web_scraped_data = "\n".join(data_filtered_text_content)
-
-        web_scraped_data_integrated_speech = self.append_web_scraped_data(base_speech, web_scraped_data)
+        
+        web_scraped_data_integrated_speech = self.append_web_scraped_data(base_speech, context)
         print('*' * 80)
         print(web_scraped_data_integrated_speech)
         print('*' * 80)
-
 
         # personality_improved_speech = self.get_metrics(web_scraped_data_integrated_speech)
         # print('*' * 80)
         # print(personality_improved_speech)
         # print('*' * 80)
 
-
         # eq_improved_speech = self.enhance_eq_score(personality_improved_speech)
         # print('*' * 80)
         # print(eq_improved_speech)
         # print('*' * 80)
 
-
         # liwc_improved_speech = self.enhance_liwc_metrics(eq_improved_speech)
         # print('*' * 80)
         # print(liwc_improved_speech)
         # print('*' * 80)
-
-
 
         # primed_speech = self.prime_speech(liwc_improved_speech)
         # print('*' * 80)
@@ -249,7 +261,6 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
         print('*' * 80)
         print(filtered_speech)
         print('*' * 80)
-
 
         if language != "en":
             translated_speech = self.translate_speech(filtered_speech, language)

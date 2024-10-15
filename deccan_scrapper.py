@@ -88,8 +88,8 @@ class WebScraper:
                 return True
         return False
 
-    def save_to_file(self, text_content, file_name='web_scraped_data.txt'):
-        with open(file_name, 'w') as file:
-            for text in text_content:
-                file.write(text + '\n\n')
+    # def save_to_file(self, text_content, file_name='web_scraped_data.txt'):
+    #     with open(file_name, 'w') as file:
+    #         for text in text_content:
+    #             file.write(text + '\n\n')
 
