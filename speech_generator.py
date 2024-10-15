@@ -1,4 +1,5 @@
-from deccan_scrapper import WebScraper
+from deccan_scrapper import DeccanWebScraper
+from hindu_state_scrapper import HinduStateScraper
 
 slogans = """
 Bari Bari Sab Ki Bari, Ab Ki Bari Atal Bihari
@@ -41,6 +42,28 @@ opening = """
 
 "Do you ever wonder why you should listen to any leader at all? Well, it's not just about listening—it's about being heard. And today, I am here because your voice is what truly matters. Lets make sure the future reflects that."
 """
+
+farmer_stories = """
+EXAMPLE FARMER STORIES:
+
+[Story 1 Style - Conversation between Leader and the Farmer]:
+I still remember the day I met Bhairav Singh, a farmer like many of you, standing in his dry, cracked field. His face was lined with worry, and his voice heavy with frustration. He looked at me and said, “Saab, every year I work my land, but the weight of loans, corrupt officials, and unfair policies crush me. Ive lost faith. This government doesnt care about farmers like us.”
+His words broke my heart, because I knew he wasnt alone. Many of you have faced the same struggles—endless loans, lost land, and corrupt systems blocking your progress. I promised Bhairav that day, “If given the chance, I will fight for you. I will end this corruption and bring justice to the farmers.”
+And today, I stand before you, after bringing those promises to life. We introduced fair loan schemes, land reforms, and crushed the corrupt systems that once strangled your livelihoods.
+Last week, I visited Bhairav again. This time, his fields were green, and his face shone with joy. He fell to his knees, tears in his eyes, and said, “Saab, you saved us. My family eats, my land thrives, and my debt is gone. You gave us back our dignity.”
+That happiness, that pride, is what I promised to every farmer. We are no longer bound by broken promises. Together, we have created a future where our farmers stand tall again.
+[End of Story 1]
+
+"""
+
+humour = """
+
+"""
+
+scientific_facts = """
+
+"""
+
 
 # List of South Indian states in lowercase and hyphenated
 south_states = [
@@ -86,13 +109,22 @@ class SpeechGenerator:
         self.sentiment_analyzer = sentiment_analyzer
         self.liwc_analyzer = liwc_analyzer
 
-    def generate_base_speech(self, speech, requirements):
+    def generate_base_speech(self, speech, requirements, state):
         prompt = """Read the instructions carefully to generate the output with tone, facial expressions, and emotions that aptly suit each statement.\n\n"""
         prompt += requirements
         prompt += "\n\n"
-        prompt += """Generate the speech based on the given context and requirements.
-            1. Express how proud the speaker is to be able to communicate with the audience, express gratitude towards them. 
-            2. For each statement, add annotations for tone, facial expressions, and emotions in parentheses. Add annotations wherever necessary - in the beginning of a sentence, in between, at the end, so on. For example: 'Ladies and gentlemen[Cheerful tone, hands opened towards the audience], my friends of Tamil Nadu, it's truly an honor to stand before you[moving right hand from up to down] here in Chennai today, as we prepare for the crucial MP elections! [Warm smile, hands clasped together, short pause]'
+        prompt += f"""Generate the speech based on the given context and requirements.
+            1. The speech is being delivered to the people of {state}. So try to restrict yourself to {state} affairs.
+            2. Introductory Statements in Local Language (Emotional and Cultural Bridge):
+                Begin with a culturally resonant greetings from {state} and use regional dialects to trigger
+                familiarity and trust. From a neuroscience perspective, hearing familiar phrases and
+                tones can activate the ventromedial PFC, which is associated with social decision-
+                making and trust. Use rhymes or provocative catchphrases to activate the Amygdala
+                (emotional response), making the audience more likely to remember your message.
+                    Example: 'Mere pyare bhaiyon aur behno' (in Hindi), 'Esteemed friends and
+                families of our land' (in English).
+            3. Express how proud the speaker is to be able to communicate with the audience, express gratitude towards them. 
+            4. For each statement, add annotations for tone, facial expressions, and emotions in parentheses. Add annotations wherever necessary - in the beginning of a sentence, in between, at the end, so on. For example: 'Ladies and gentlemen[Cheerful tone, hands opened towards the audience], my friends of Tamil Nadu, it's truly an honor to stand before you[moving right hand from up to down] here in Chennai today, as we prepare for the crucial MP elections! [Warm smile, hands clasped together, short pause]'
             Here are some example openings, generate similar ones with equal or better intensity or generate new ones.
             \n\nExample Openings:\n"""
         prompt += opening
@@ -109,8 +141,20 @@ class SpeechGenerator:
         Here are some example slogans, generate a new slogan based on these."""
         prompt += "\n\nExample Slogans:\n"
         prompt += slogans
-        prompt += "\n\nYour response must be an annotated speech following the given requirements as well as a catchy slogan embedded within the speech at few places."
+        prompt += "\n\nYour response must be an annotated speech only following the given requirements as well as a catchy slogan embedded within the speech at few places."
         return self.querier.query(prompt)
+    
+    def include_a_story(self, speech):
+        prompt = """Append a compelling and heart touching story to the speech given.
+        1. Ensure that the story is integrated seamlessly in between, just for a short paragraph, enhancing the speech without disrupting its structure.
+        2. Blend the story into the speech seamlessly, it is fine if the speech is elongated, a comprehensive speech is good.
+        3. Make the story resonate with the audience, make them relate, make the speech sound human.
+        Here is an example story, create similar ones or improve the examples."""
+        prompt += "\n\n"
+        prompt += farmer_stories
+        prompt += "\n\nYour response must be an annotated speech following the given requirements. Make sure the base speech is inherited in your response."
+        return self.querier.query(prompt)
+        
     
     def append_web_scraped_data(self, speech, web_scraped_data):
       prompt = """You have been provided with some web-scraped data and a base speech. There are 7 tasks.
@@ -189,26 +233,46 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
 
     def generate_speech(self, speech, requirements, newspaper, state, language="en"):
 
-        base_speech = self.generate_base_speech(speech, requirements)
+        base_speech = self.generate_base_speech(speech, requirements, state)
         print('*' * 80)
         print(base_speech)
         print('*' * 80)
 
+        # story_included_speech = self.include_a_story(base_speech)
+        # print('*' * 80)
+        # print(story_included_speech)
+        # print('*' * 80)
+
         words = ['bjp', 'modi']
         state = state.lower().replace(" ", "-")
-        url="https://www.deccanchronicle.com/location/india/"+state
+        print(state)
+        print(words)
 
-        scraper = WebScraper(
-            base_url=url,
-            keywords=words,
-            num_pages_to_scrape=30
-        )
-        headlines_data = scraper.extract_headlines_from_multiple_pages()
-        filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
-        text_content = scraper.extract_information_from_headlines(filtered_headlines)
-        data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content)
-        scraper.save_to_file(data_filtered_text_content, "web_scraped_data.txt")
-        web_scraped_data = "\n".join(data_filtered_text_content)
+        if newspaper == "Deccan Chronicle":
+            url="https://www.deccanchronicle.com/location/india/"+state
+            scraper = DeccanWebScraper(
+                base_url=url,
+                keywords=words,
+                num_pages_to_scrape=15
+            )
+            headlines_data = scraper.extract_headlines_from_multiple_pages()
+            filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
+            text_content = scraper.extract_information_from_headlines(filtered_headlines)
+            data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content)
+            scraper.save_to_file(data_filtered_text_content, "web_scraped_data.txt")
+            web_scraped_data = "\n".join(data_filtered_text_content)
+        elif newspaper == "The Hindu (States)":
+            url = "https://www.thehindu.com/news/national/" + state
+            scraper = HinduStateScraper(
+                base_url=url,
+                keywords=words,
+                num_pages_to_scrape=9
+            )
+            headlines_data = scraper.extract_headlines_from_multiple_pages()
+            filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
+            text_content = scraper.extract_information_from_headlines(filtered_headlines)
+            data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content)
+            scraper.save_to_file(data_filtered_text_content, "web_scraped_data.txt")
 
         web_scraped_data_integrated_speech = self.append_web_scraped_data(base_speech, web_scraped_data)
         print('*' * 80)

@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-class WebScraper:
+class DeccanWebScraper:
     def __init__(self, base_url, keywords, num_pages_to_scrape=10):
         self.base_url = base_url
         self.keywords = keywords
