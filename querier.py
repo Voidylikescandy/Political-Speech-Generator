@@ -20,7 +20,10 @@ class Querier:
                         "role": "user",
                         "content": prompt,
                     }
-                ]
+                ],
+                # "parameters": {
+                #     "temperature": 0.6  # Add temperature here
+                # }
             }
         )
         while run.status != 'completed':
