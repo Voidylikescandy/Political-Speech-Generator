@@ -109,39 +109,32 @@ class SpeechGenerator:
         self.sentiment_analyzer = sentiment_analyzer
         self.liwc_analyzer = liwc_analyzer
 
-    def generate_base_speech(self, speech, requirements, state):
+    def generate_base_speech(self,speech, requirements, state):
         prompt = """Read the instructions carefully to generate the output with tone, facial expressions, and emotions that aptly suit each statement.\n\n"""
         prompt += requirements
         prompt += "\n\n"
         prompt += f"""Generate the speech based on the given context and requirements.
-            1. The speech is being delivered to the people of {state}. So try to restrict yourself to {state} affairs.
-            2. Introductory Statements in Local Language (Emotional and Cultural Bridge):
-                Begin with a culturally resonant greetings from {state} and use regional dialects to trigger
-                familiarity and trust. From a neuroscience perspective, hearing familiar phrases and
-                tones can activate the ventromedial PFC, which is associated with social decision-
-                making and trust. Use rhymes or provocative catchphrases to activate the Amygdala
-                (emotional response), making the audience more likely to remember your message.
-                    Example: 'Mere pyare bhaiyon aur behno' (in Hindi), 'Esteemed friends and
-                families of our land' (in English).
+            1. Introductory Statements in Local Language (Emotional and Cultural Bridge):
+                Begin with a culturally resonant greetings. use regional dialects to trigger
+                familiarity and trust. 
             3. Express how proud the speaker is to be able to communicate with the audience, express gratitude towards them. 
             4. For each statement, add annotations for tone, facial expressions, and emotions in parentheses. Add annotations wherever necessary - in the beginning of a sentence, in between, at the end, so on. For example: 'Ladies and gentlemen[Cheerful tone, hands opened towards the audience], my friends of Tamil Nadu, it's truly an honor to stand before you[moving right hand from up to down] here in Chennai today, as we prepare for the crucial MP elections! [Warm smile, hands clasped together, short pause]'
-            Here are some example openings, generate similar ones with equal or better intensity or generate new ones.
-            \n\nExample Openings:\n"""
-        prompt += opening
-        prompt += "\n\nSpeech:\n"
-        prompt += speech
+           """
+        # prompt += opening
+        # prompt += "\n\nSpeech:\n"
+        # prompt += speech
         prompt += "\n\n"
-        prompt += """Incorporate a single catchy, proactive catchphrase. This is to build the bridge between the leader and the audience. Make the slogan rhyming to make it catchy. Print the slogans in English only. 
-        First, understand the context of the speech. Generate a slogan which matches the context of the speech given and integrate it smoothly into the opening.
-        And use it 
-            1. In the speech in the beginning
-            2. In between few paragraphs 
-            3. And at the end.
-        Use it in places where it makes most sense which provide strength to the slogan. 
-        Here are some example slogans, generate a new slogan based on these."""
-        prompt += "\n\nExample Slogans:\n"
-        prompt += slogans
-        prompt += "\n\nYour response must be an annotated speech only following the given requirements as well as a catchy slogan embedded within the speech at few places."
+        # prompt += """Incorporate a single catchy, proactive catchphrase. This is to build the bridge between the leader and the audience. Make the slogan rhyming to make it catchy. Print the slogans in English only. 
+        # First, understand the context of the speech. Generate a slogan which matches the context of the speech given and integrate it smoothly into the opening.
+        # And use it 
+        #     1. In the speech in the beginning
+        #     2. In between few paragraphs 
+        #     3. And at the end.
+        # Use it in places where it makes most sense which provide strength to the slogan. 
+        # Here are some example slogans, generate a new slogan based on these."""
+        # prompt += "\n\nExample Slogans:\n"
+        # prompt += slogans
+        # prompt += "\n\nYour response must be an annotated speech only following the given requirements as well as a catchy slogan embedded within the speech at few places."
         return self.querier.query(prompt)
     
     def include_a_story(self, speech):
@@ -194,33 +187,33 @@ class SpeechGenerator:
         return self.querier.query(prompt)
 
 
-    def get_metrics(self, speech):
-        prompt = """You need to assess the following 5 personality traits from the below speech by giving it a score of 1 to 10 (discrete values) where 10 is the highest score and 1 is the lowest score (use floor value):
-    (Agreeableness, Conscientiousness, Extraversion, Emotional range, Openness). Output should only be the scores with no extra text or information. Then regenerate the speech to improve the metrics and also sound more human.\n\n"""
-        prompt += speech
-        return self.querier.query(prompt)
+#     def get_metrics(self, speech):
+#         prompt = """You need to assess the following 5 personality traits from the below speech by giving it a score of 1 to 10 (discrete values) where 10 is the highest score and 1 is the lowest score (use floor value):
+#     (Agreeableness, Conscientiousness, Extraversion, Emotional range, Openness). Output should only be the scores with no extra text or information. Then regenerate the speech to improve the metrics and also sound more human.\n\n"""
+#         prompt += speech
+#         return self.querier.query(prompt)
 
-    def enhance_eq_score(self, speech):
-        sentiment = self.sentiment_analyzer.get_sentiment(speech)
-        emotional_quotient = self.sentiment_analyzer.get_emotional_quotient(speech)
-        prompt = """You are provided with speech and its Sentiment and Emotional Quotient. Add words to the speech such that the emotional quotient improves. Regenerate the speech accordingly.\n\n"""
-        prompt += speech
-        prompt += f"\nSentiment: {sentiment}\nEmotional Quotient: {emotional_quotient}"
-        return self.querier.query(prompt)
+#     def enhance_eq_score(self, speech):
+#         sentiment = self.sentiment_analyzer.get_sentiment(speech)
+#         emotional_quotient = self.sentiment_analyzer.get_emotional_quotient(speech)
+#         prompt = """You are provided with speech and its Sentiment and Emotional Quotient. Add words to the speech such that the emotional quotient improves. Regenerate the speech accordingly.\n\n"""
+#         prompt += speech
+#         prompt += f"\nSentiment: {sentiment}\nEmotional Quotient: {emotional_quotient}"
+#         return self.querier.query(prompt)
 
-    def enhance_liwc_metrics(self, speech):
-        filtered_categories = self.liwc_analyzer.get_categories(speech)
-        prompt = """You need to improvise the given speech text based on the provided information of Linguistic Inquiry and Word Count (LIWC).\n\n The Speech is: \n"""
-        prompt += speech
-        prompt += "\nLIWC information: \n\n"
-        prompt += str(filtered_categories)
-        return self.querier.query(prompt)
+#     def enhance_liwc_metrics(self, speech):
+#         filtered_categories = self.liwc_analyzer.get_categories(speech)
+#         prompt = """You need to improvise the given speech text based on the provided information of Linguistic Inquiry and Word Count (LIWC).\n\n The Speech is: \n"""
+#         prompt += speech
+#         prompt += "\nLIWC information: \n\n"
+#         prompt += str(filtered_categories)
+#         return self.querier.query(prompt)
 
-    def prime_speech(self, speech):
-        prompt = """You need to assess the following speech for primings namely Issue Priming, Candidate Attributes Priming, Mood and Emotional Priming, Social Identity Priming, Economic Priming, Value-Based Priming, Repetition and Consistency, Visual and Symbolic Priming, Use of Surrogates and Endorsements, Framing and Issue Association, Contextual Priming. Give a rating for each metric on the scale of 10. 1 is the lowest and 10 is the highest.
-Then, regenerate the speech by improving those metrics and make it sound more human. Output should only consist of the regenerated speech and nothing else. Do not even give any heading as Regenerated Speech, output should only be the regenerated speech itself.\n\n"""
-        prompt += speech
-        return self.querier.query(prompt)
+#     def prime_speech(self, speech):
+#         prompt = """You need to assess the following speech for primings namely Issue Priming, Candidate Attributes Priming, Mood and Emotional Priming, Social Identity Priming, Economic Priming, Value-Based Priming, Repetition and Consistency, Visual and Symbolic Priming, Use of Surrogates and Endorsements, Framing and Issue Association, Contextual Priming. Give a rating for each metric on the scale of 10. 1 is the lowest and 10 is the highest.
+# Then, regenerate the speech by improving those metrics and make it sound more human. Output should only consist of the regenerated speech and nothing else. Do not even give any heading as Regenerated Speech, output should only be the regenerated speech itself.\n\n"""
+#         prompt += speech
+#         return self.querier.query(prompt)
 
     def strip_text(self, speech):
         lines = speech.split("\n")
@@ -243,73 +236,48 @@ Then, regenerate the speech by improving those metrics and make it sound more hu
         # print(story_included_speech)
         # print('*' * 80)
 
-        words = ['bjp', 'modi']
-        state = state.lower().replace(" ", "-")
-        print(state)
-        print(words)
+        # words = ['bjp', 'modi']
+        # state = state.lower().replace(" ", "-")
+        # print(state)
+        # print(words)
 
-        if newspaper == "Deccan Chronicle":
-            url="https://www.deccanchronicle.com/location/india/"+state
-            scraper = DeccanWebScraper(
-                base_url=url,
-                keywords=words,
-                num_pages_to_scrape=15
-            )
-            headlines_data = scraper.extract_headlines_from_multiple_pages()
-            filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
-            text_content = scraper.extract_information_from_headlines(filtered_headlines)
-            data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content)
-            scraper.save_to_file(data_filtered_text_content, "web_scraped_data.txt")
-            web_scraped_data = "\n".join(data_filtered_text_content)
-        elif newspaper == "The Hindu (States)":
-            url = "https://www.thehindu.com/news/national/" + state
-            scraper = HinduStateScraper(
-                base_url=url,
-                keywords=words,
-                num_pages_to_scrape=9
-            )
-            headlines_data = scraper.extract_headlines_from_multiple_pages()
-            filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
-            text_content = scraper.extract_information_from_headlines(filtered_headlines)
-            data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content)
-            scraper.save_to_file(data_filtered_text_content, "web_scraped_data.txt")
+        # if newspaper == "Deccan Chronicle":
+        #     url="https://www.deccanchronicle.com/location/india/"+state
+        #     scraper = DeccanWebScraper(
+        #         base_url=url,
+        #         keywords=words,
+        #         num_pages_to_scrape=15
+        #     )
+        #     headlines_data = scraper.extract_headlines_from_multiple_pages()
+        #     filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
+        #     text_content = scraper.extract_information_from_headlines(filtered_headlines)
+        #     data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content)
+        #     scraper.save_to_file(data_filtered_text_content, "web_scraped_data.txt")
+        #     web_scraped_data = "\n".join(data_filtered_text_content)
+        # elif newspaper == "The Hindu (States)":
+        #     url = "https://www.thehindu.com/news/national/" + state
+        #     scraper = HinduStateScraper(
+        #         base_url=url,
+        #         keywords=words,
+        #         num_pages_to_scrape=9
+        #     )
+        #     headlines_data = scraper.extract_headlines_from_multiple_pages()
+        #     filtered_headlines = scraper.filter_headlines_by_keywords(headlines_data)
+        #     text_content = scraper.extract_information_from_headlines(filtered_headlines)
+        #     data_filtered_text_content = scraper.extract_sentences_with_numerical_data(text_content)
+        #     scraper.save_to_file(data_filtered_text_content, "web_scraped_data.txt")
 
-        web_scraped_data_integrated_speech = self.append_web_scraped_data(base_speech, web_scraped_data)
-        print('*' * 80)
-        print(web_scraped_data_integrated_speech)
-        print('*' * 80)
-
-
-        # personality_improved_speech = self.get_metrics(web_scraped_data_integrated_speech)
+        # web_scraped_data_integrated_speech = self.append_web_scraped_data(base_speech, web_scraped_data)
         # print('*' * 80)
-        # print(personality_improved_speech)
+        # print(web_scraped_data_integrated_speech)
         # print('*' * 80)
 
-
-        # eq_improved_speech = self.enhance_eq_score(personality_improved_speech)
+        # final_speech = self.final_check(base_speech)
         # print('*' * 80)
-        # print(eq_improved_speech)
-        # print('*' * 80)
-
-
-        # liwc_improved_speech = self.enhance_liwc_metrics(eq_improved_speech)
-        # print('*' * 80)
-        # print(liwc_improved_speech)
+        # print(final_speech)
         # print('*' * 80)
 
-
-
-        # primed_speech = self.prime_speech(liwc_improved_speech)
-        # print('*' * 80)
-        # print(primed_speech)
-        # print('*' * 80)
-
-        final_speech = self.final_check(web_scraped_data_integrated_speech)
-        print('*' * 80)
-        print(final_speech)
-        print('*' * 80)
-
-        filtered_speech = self.strip_text(final_speech)
+        filtered_speech = self.strip_text(base_speech)
         print('*' * 80)
         print(filtered_speech)
         print('*' * 80)
