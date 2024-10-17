@@ -136,6 +136,30 @@ class SpeechGenerator:
         # prompt += slogans
         # prompt += "\n\nYour response must be an annotated speech only following the given requirements as well as a catchy slogan embedded within the speech at few places."
         return self.querier.query(prompt)
+
+    def test1(self):
+        prompt = """Write a speech for Prime Minister Narendra Modi to be delivered in Telangana. The speech should revolve around a character named Yadaiah, a hardworking and humble man from Telangana, who has suffered immensely due to the failures of the Congress regime in the state. Through Yadaiah's story, the speech should emotionally highlight the key issues faced by the people of Telangana, such as unemployment, farmer distress, corruption, lack of proper healthcare, poor infrastructure, and other relevant local concerns. The tone should be empathetic, emotionally resonant, and should show Modi as a leader who understands the pain of the common people and is committed to bringing about real change and development in Telangana. Make sure the speech connects with the audience by invoking shared emotions and struggles, while also inspiring hope for a better future under Modi’s leadership."""
+        return self.querier.query(prompt)
+
+    def test2(self,speech):
+        prompt = speech
+        prompt += "\n\n"
+        prompt += """You are Narendra Modi, the Prime Minister of India
+Improvise this speech with the following aspects:
+1.	Give introductory statements in local language of the crowd-This is to start building the bridge between the leader and the audience. Use catchy, provocative catchphrases and limericks that can make up for good hashtags.
+
+2.	Build a topic of discussion that would make the audience connect with the leader- partys manifesto or a catch phrase.
+
+3.	Know your audience-Web scrape all the information related to schemes, policies, funds, development and other factors made by the present party with respect to a city/town/state- whos a local hero in one city, which festival is being celebrated in another and reciting a colloquial verse in a different language within the same day. 
+
+4.	Add details from point no. 3 into the speech as and when required. Theres no point, for instance, talking about complex economic indicators to a crowd of unskilled labours who are curious about how you will help them get a better lifestyle.
+
+5.	Connect the dots- point 2 and 4 need to be presented with a connection. 
+
+6.	Incorporate emotions into the speech. Emotions can be invoked by telling stories and depicting current events in a way that evokes an emotional response from your audience -This is very important.
+
+7.	Work on body language and include gestures"""
+        return self.querier.query(prompt)
     
     def include_a_story(self, speech):
         prompt = """Append a compelling and heart touching story to the speech given.
@@ -226,7 +250,13 @@ class SpeechGenerator:
 
     def generate_speech(self, speech, requirements, newspaper, state, language="en"):
 
-        base_speech = self.generate_base_speech(speech, requirements, state)
+        # base_speech = self.generate_base_speech(speech, requirements, state)
+        base_speech = self.test1()
+        print('*' * 80)
+        print(base_speech)
+        print('*' * 80)
+
+        base_speech = self.test2(base_speech)
         print('*' * 80)
         print(base_speech)
         print('*' * 80)

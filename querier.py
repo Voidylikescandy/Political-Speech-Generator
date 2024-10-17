@@ -12,6 +12,12 @@ class Querier:
     def query(self, prompt):
         assistant_id = os.getenv('OPENAI_ASSISTANT_ID')
         assistant = self.client.beta.assistants.retrieve(assistant_id)
+
+        # # Upload the user provided file to OpenAI
+        # message_file = self.client.files.create(
+        # file=open("modi_example.txt", "rb"), purpose="assistants"
+        # )
+
         run = self.client.beta.threads.create_and_run(
             assistant_id=assistant.id,
             thread={
@@ -19,10 +25,12 @@ class Querier:
                     {
                         "role": "user",
                         "content": prompt,
+                        # Attach the new file to the message.
                     }
                 ]
             }
         )
+
         while run.status != 'completed':
             run = self.client.beta.threads.runs.retrieve(run_id=run.id, thread_id=run.thread_id)
         messages = self.client.beta.threads.messages.list(run.thread_id)
